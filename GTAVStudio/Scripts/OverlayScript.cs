@@ -50,6 +50,7 @@ namespace GTAVStudio.Scripts
         internal static void ReloadSettings()
         {
             StudioSettings.Reload();
+            StudioTranslations.Reload();
             Overlay.Dispose();
             Overlay = new OverlayForm();
         }

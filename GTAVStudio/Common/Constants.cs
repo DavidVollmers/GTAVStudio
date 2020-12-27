@@ -5,8 +5,11 @@
         public static class Settings
         {
             public const string Overlay = nameof(Overlay);
-            
-            public const string Translations = nameof(Translations);
+        }
+
+        public static class Translations
+        {
+            public const string Overlay = nameof(Overlay);
         }
     }
 }

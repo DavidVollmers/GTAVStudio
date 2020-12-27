@@ -44,7 +44,7 @@ namespace GTAVStudio.Forms
 
             var vehicleMenuItem = new ToolStripMenuItem();
             vehicleMenuItem.Text =
-                StudioSettings.GetValue(Constants.Settings.Translations, "Overlay_Menu_Vehicles", "Vehicles");
+                StudioTranslations.GetValue(Constants.Translations.Overlay, "VehiclesMenu", "Vehicles");
 
             var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
             foreach (var vehicleHash in vehicleHashes.OrderBy(v => Enum.GetName(typeof(VehicleHash), v)))
@@ -67,11 +67,11 @@ namespace GTAVStudio.Forms
 
             var gtavStudioMenuItem = new ToolStripMenuItem();
             gtavStudioMenuItem.Text =
-                StudioSettings.GetValue(Constants.Settings.Translations, "Overlay_Menu_GTAVStudio", "Studio");
+                StudioTranslations.GetValue(Constants.Translations.Overlay, "GTAVStudioMenu", "Studio");
 
             var reloadSettingsMenuItem = new ToolStripMenuItem();
             reloadSettingsMenuItem.Text =
-                StudioSettings.GetValue(Constants.Settings.Translations, "Overlay_Menu_GTAVStudio_ReloadSettings",
+                StudioTranslations.GetValue(Constants.Translations.Overlay, "GTAVStudioMenu_ReloadSettings",
                     "Reload Settings");
             reloadSettingsMenuItem.Click += (sender, args) =>
             {
