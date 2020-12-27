@@ -30,15 +30,21 @@ namespace GTAVStudio.Forms
                 break;
             }
 
+            KeyUp += OnKeyUp;
+
             SuspendLayout();
 
             var menuStrip = new MenuStrip();
             menuStrip.Dock = DockStyle.Top;
+            menuStrip.BackColor = Color.DimGray;
             MainMenuStrip = menuStrip;
             Height = menuStrip.Height;
 
+            #region Vehicles
+
             var vehicleMenuItem = new ToolStripMenuItem();
-            vehicleMenuItem.Text = "Vehicles";
+            vehicleMenuItem.Text =
+                StudioSettings.GetValue(Constants.Settings.Translations, "Overlay_Menu_Vehicles", "Vehicles");
 
             var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
             foreach (var vehicleHash in vehicleHashes.OrderBy(v => Enum.GetName(typeof(VehicleHash), v)))
@@ -55,11 +61,44 @@ namespace GTAVStudio.Forms
 
             menuStrip.Items.Add(vehicleMenuItem);
 
+            #endregion
+
+            #region GTAVStudio
+
+            var gtavStudioMenuItem = new ToolStripMenuItem();
+            gtavStudioMenuItem.Text =
+                StudioSettings.GetValue(Constants.Settings.Translations, "Overlay_Menu_GTAVStudio", "Studio");
+
+            var reloadSettingsMenuItem = new ToolStripMenuItem();
+            reloadSettingsMenuItem.Text =
+                StudioSettings.GetValue(Constants.Settings.Translations, "Overlay_Menu_GTAVStudio_ReloadSettings",
+                    "Reload Settings");
+            reloadSettingsMenuItem.Click += (sender, args) =>
+            {
+                OverlayScript.ReloadSettings();
+                OverlayScript.ToggleOverlayNextFrame = true;
+            };
+
+            gtavStudioMenuItem.DropDownItems.Add(reloadSettingsMenuItem);
+
+            menuStrip.Items.Add(gtavStudioMenuItem);
+
+            #endregion
+
             Controls.Add(menuStrip);
 
             ResumeLayout();
 
             User32.SetWindowPos(Handle, User32.HWND_TOPMOST, 0, 0, 0, 0, User32.TOPMOST_FLAGS);
+        }
+
+        private static void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == StudioSettings.GetValue(Constants.Settings.Overlay, "ToggleKey", Keys.F12)
+                || e.KeyCode == Keys.Escape)
+            {
+                OverlayScript.ToggleOverlayNextFrame = true;
+            }
         }
     }
 }

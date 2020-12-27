@@ -9,9 +9,10 @@ using GTAVStudio.Forms;
 
 namespace GTAVStudio.Scripts
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class OverlayScript : Script
     {
-        private static readonly OverlayForm Overlay = new OverlayForm();
+        private static OverlayForm Overlay = new OverlayForm();
         private static bool _threadStarted;
         private static bool _threadStarting;
         private static bool _overlayToggle;
@@ -28,10 +29,10 @@ namespace GTAVStudio.Scripts
             if (ToggleOverlayNextFrame)
             {
                 ToggleOverlayNextFrame = false;
-                
+
                 ToggleOverlay();
             }
-            
+
             if (_overlayToggle)
             {
                 Hud.ShowCursorThisFrame();
@@ -40,13 +41,20 @@ namespace GTAVStudio.Scripts
 
         private static void OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.F12)
+            if (e.KeyCode == StudioSettings.GetValue(Constants.Settings.Overlay, "ToggleKey", Keys.F12))
             {
                 ToggleOverlay();
             }
         }
 
-        public static void ToggleOverlay()
+        internal static void ReloadSettings()
+        {
+            StudioSettings.Reload();
+            Overlay.Dispose();
+            Overlay = new OverlayForm();
+        }
+        
+        internal static void ToggleOverlay()
         {
             if (_threadStarting) return;
 

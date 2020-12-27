@@ -44,6 +44,8 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Common\Constants.cs" />
+        <Compile Include="Common\StudioSettings.cs" />
         <Compile Include="Common\User32.cs" />
         <Compile Include="Forms\OverlayForm.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,17 +55,16 @@
     <ItemGroup>
       <None Include="packages.config" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Include="GTAVStudio.ini">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
-    </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
     <Target Name="AfterBuild">
         <Copy SourceFiles="$(OutputPath)\\GTAVStudio.dll" DestinationFolder="C:\\Program Files\\Rockstar Games\\Grand Theft Auto V\\scripts" ContinueOnError="true" />
         <Copy SourceFiles="$(OutputPath)\\GTAVStudio.pdb" DestinationFolder="C:\\Program Files\\Rockstar Games\\Grand Theft Auto V\\scripts" ContinueOnError="true" />
+        <Copy SourceFiles="$(OutputPath)\\GTAVStudio.ini" DestinationFolder="C:\\Program Files\\Rockstar Games\\Grand Theft Auto V\\scripts" ContinueOnError="true" />
     </Target>
 
 </Project>

@@ -3,6 +3,7 @@ using GTA;
 
 namespace GTAVStudio.Scripts
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class VehicleScript : Script
     {
         public static VehicleHash SpawnVehicleNextFrame;
@@ -23,7 +24,7 @@ namespace GTAVStudio.Scripts
             }
         }
 
-        public static void SpawnVehicle(VehicleHash hash)
+        internal static void SpawnVehicle(VehicleHash hash)
         {
             var model = new Model(hash);
 
