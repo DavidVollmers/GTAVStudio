@@ -1,15 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using GTA;
 using GTAVStudio.Common;
 using GTAVStudio.Scripts;
+using GTAVStudio.Theme;
 
 namespace GTAVStudio.Forms
 {
+    class DynamicComponent
+    {
+        public string TranslationKey { get; set; }
+
+        public IComponent Component { get; set; }
+
+        public string DefaultTranslation { get; set; }
+    }
+
     public class OverlayForm : Form
     {
+        private readonly MenuStrip _menuStrip = new MenuStrip();
+        private readonly List<DynamicComponent> _dynamicComponents = new List<DynamicComponent>();
+
         public OverlayForm()
         {
             InitializeComponents();
@@ -18,11 +33,10 @@ namespace GTAVStudio.Forms
         private void InitializeComponents()
         {
             FormBorderStyle = FormBorderStyle.None;
-            BackColor = Color.Red;
-            TransparencyKey = Color.Red;
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.Manual;
             MinimumSize = new Size(0, 0);
-            foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+            foreach (var screen in Screen.AllScreens)
             {
                 if (!screen.Bounds.Contains(Location)) continue;
                 Location = new Point(screen.Bounds.Left, screen.Bounds.Top);
@@ -34,17 +48,20 @@ namespace GTAVStudio.Forms
 
             SuspendLayout();
 
-            var menuStrip = new MenuStrip();
-            menuStrip.Dock = DockStyle.Top;
-            menuStrip.BackColor = Color.DimGray;
-            MainMenuStrip = menuStrip;
-            Height = menuStrip.Height;
+            _menuStrip.Renderer = new ThemeToolStripRenderer();
+            _menuStrip.Dock = DockStyle.Top;
+            MainMenuStrip = _menuStrip;
+            Height = _menuStrip.Height;
 
             #region Vehicles
 
             var vehicleMenuItem = new ToolStripMenuItem();
-            vehicleMenuItem.Text =
-                StudioTranslations.GetValue(Constants.Translations.Overlay, "VehiclesMenu", "Vehicles");
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = vehicleMenuItem,
+                TranslationKey = "VehiclesMenu",
+                DefaultTranslation = "Vehicles"
+            });
 
             var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
             foreach (var vehicleHash in vehicleHashes.OrderBy(v => Enum.GetName(typeof(VehicleHash), v)))
@@ -59,37 +76,66 @@ namespace GTAVStudio.Forms
                 vehicleMenuItem.DropDownItems.Add(menuItem);
             }
 
-            menuStrip.Items.Add(vehicleMenuItem);
+            _menuStrip.Items.Add(vehicleMenuItem);
 
             #endregion
 
             #region GTAVStudio
 
             var gtavStudioMenuItem = new ToolStripMenuItem();
-            gtavStudioMenuItem.Text =
-                StudioTranslations.GetValue(Constants.Translations.Overlay, "GTAVStudioMenu", "Studio");
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = gtavStudioMenuItem,
+                TranslationKey = "GTAVStudioMenu",
+                DefaultTranslation = "Studio"
+            });
 
             var reloadSettingsMenuItem = new ToolStripMenuItem();
-            reloadSettingsMenuItem.Text =
-                StudioTranslations.GetValue(Constants.Translations.Overlay, "GTAVStudioMenu_ReloadSettings",
-                    "Reload Settings");
-            reloadSettingsMenuItem.Click += (sender, args) =>
+            _dynamicComponents.Add(new DynamicComponent
             {
-                OverlayScript.ReloadSettings();
-                OverlayScript.ToggleOverlayNextFrame = true;
-            };
+                Component = reloadSettingsMenuItem,
+                TranslationKey = "GTAVStudioMenu_ReloadSettings",
+                DefaultTranslation = "Reload Settings"
+            });
+            reloadSettingsMenuItem.Click += (sender, args) => { OverlayScript.ReloadSettingsNextFrame = true; };
 
             gtavStudioMenuItem.DropDownItems.Add(reloadSettingsMenuItem);
 
-            menuStrip.Items.Add(gtavStudioMenuItem);
+            _menuStrip.Items.Add(gtavStudioMenuItem);
 
             #endregion
 
-            Controls.Add(menuStrip);
+            Controls.Add(_menuStrip);
+
+            SetDynamicComponentValues();
 
             ResumeLayout();
 
             User32.SetWindowPos(Handle, User32.HWND_TOPMOST, 0, 0, 0, 0, User32.TOPMOST_FLAGS);
+        }
+
+        public void Reload()
+        {
+            SetDynamicComponentValues();
+            Refresh();
+        }
+
+        private void SetDynamicComponentValues()
+        {
+            BackColor = TransparencyKey =
+                StudioSettings.GetValue(Constants.Settings.Theme, "TransparencyKey", Color.Red);
+
+            _menuStrip.BackColor = StudioSettings.GetValue(Constants.Settings.Theme, "Menu_BackColor", Color.DimGray);
+
+            foreach (var dynamicComponent in _dynamicComponents)
+            {
+                if (dynamicComponent.Component is ToolStripMenuItem menuItem)
+                {
+                    menuItem.Text =
+                        StudioTranslations.GetValue(Constants.Translations.Overlay, dynamicComponent.TranslationKey,
+                            dynamicComponent.DefaultTranslation);
+                }
+            }
         }
 
         private static void OnKeyUp(object sender, KeyEventArgs e)

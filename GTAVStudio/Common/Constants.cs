@@ -5,6 +5,8 @@
         public static class Settings
         {
             public const string Overlay = nameof(Overlay);
+
+            public const string Theme = nameof(Theme);
         }
 
         public static class Translations

@@ -52,6 +52,8 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="Scripts\OverlayScript.cs" />
         <Compile Include="Scripts\VehicleScript.cs" />
+        <Compile Include="Theme\ThemeColorTable.cs" />
+        <Compile Include="Theme\ThemeToolStripRenderer.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

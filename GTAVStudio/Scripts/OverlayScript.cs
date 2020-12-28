@@ -16,7 +16,9 @@ namespace GTAVStudio.Scripts
         private static bool _threadStarted;
         private static bool _threadStarting;
         private static bool _overlayToggle;
+        private static Thread _thread;
         public static bool ToggleOverlayNextFrame;
+        public static bool ReloadSettingsNextFrame;
 
         public OverlayScript()
         {
@@ -26,6 +28,13 @@ namespace GTAVStudio.Scripts
 
         private static void OnTick(object sender, EventArgs e)
         {
+            if (ReloadSettingsNextFrame)
+            {
+                ReloadSettingsNextFrame = false;
+                
+                ReloadSettings();
+            }
+            
             if (ToggleOverlayNextFrame)
             {
                 ToggleOverlayNextFrame = false;
@@ -51,10 +60,9 @@ namespace GTAVStudio.Scripts
         {
             StudioSettings.Reload();
             StudioTranslations.Reload();
-            Overlay.Dispose();
-            Overlay = new OverlayForm();
+            Overlay.Reload();
         }
-        
+
         internal static void ToggleOverlay()
         {
             if (_threadStarting) return;
@@ -65,9 +73,9 @@ namespace GTAVStudio.Scripts
             {
                 _threadStarting = true;
 
-                var thread = new Thread(ShowForm);
-                thread.SetApartmentState(ApartmentState.STA);
-                thread.Start();
+                _thread = new Thread(ShowForm);
+                _thread.SetApartmentState(ApartmentState.STA);
+                _thread.Start();
             }
             else
             {
