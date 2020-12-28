@@ -36,6 +36,8 @@ namespace GTAVStudio.Forms
         private readonly ToolStripMenuItem _disableWantedLevelMenuItem = new ToolStripMenuItem();
         private readonly ToolStripMenuItem _vehicleInvincibleMenuItem = new ToolStripMenuItem();
         private readonly ToolStripMenuItem _playerFlyModeMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _vehicleSpeedModeMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _stickySeatModeMenuItem = new ToolStripMenuItem();
 
         public bool InfiniteAmmo
         {
@@ -65,6 +67,16 @@ namespace GTAVStudio.Forms
         public bool VehicleInvincible
         {
             set => _vehicleInvincibleMenuItem.Checked = value;
+        }
+
+        public bool VehicleSpeedMode
+        {
+            set => _vehicleSpeedModeMenuItem.Checked = value;
+        }
+
+        public bool StickySeatMode
+        {
+            set => _stickySeatModeMenuItem.Checked = value;
         }
 
         protected override CreateParams CreateParams
@@ -177,6 +189,38 @@ namespace GTAVStudio.Forms
                 TranslationKey = "VehiclesMenu",
                 DefaultTranslation = "Vehicles"
             });
+            
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _vehicleSpeedModeMenuItem,
+                TranslationKey = "VehiclesMenu_SpeedMode",
+                DefaultTranslation = "Speedy Gonzales",
+                ShortcutKey = "VehicleSpeedMode",
+                ShortcutKeysDefault = Keys.None,
+                ShortcutDisplayStringDefault = "None"
+            });
+            _vehicleSpeedModeMenuItem.CheckOnClick = true;
+            _vehicleSpeedModeMenuItem.CheckedChanged += (sender, args) =>
+            {
+                VehicleScript.SpeedMode = _vehicleSpeedModeMenuItem.Checked;
+            };
+            vehicleMenuItem.DropDownItems.Add(_vehicleSpeedModeMenuItem);
+            
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _stickySeatModeMenuItem,
+                TranslationKey = "VehiclesMenu_StickySeatMode",
+                DefaultTranslation = "Sticky Seat",
+                ShortcutKey = "VehicleStickySeatMode",
+                ShortcutKeysDefault = Keys.None,
+                ShortcutDisplayStringDefault = "None"
+            });
+            _stickySeatModeMenuItem.CheckOnClick = true;
+            _stickySeatModeMenuItem.CheckedChanged += (sender, args) =>
+            {
+                VehicleScript.StickySeatMode = _stickySeatModeMenuItem.Checked;
+            };
+            vehicleMenuItem.DropDownItems.Add(_stickySeatModeMenuItem);
             
             _dynamicComponents.Add(new DynamicComponent
             {

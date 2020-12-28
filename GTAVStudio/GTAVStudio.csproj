@@ -48,6 +48,7 @@
         <Compile Include="Common\StudioSettings.cs" />
         <Compile Include="Common\StudioTranslations.cs" />
         <Compile Include="Common\User32.cs" />
+        <Compile Include="Extensions\EntityExtensions.cs" />
         <Compile Include="Extensions\Vector3Extensions.cs" />
         <Compile Include="Forms\OverlayForm.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

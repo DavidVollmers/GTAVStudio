@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Windows.Forms;
 using GTA;
-using GTA.UI;
 using GTAVStudio.Common;
+using GTAVStudio.Extensions;
 
 namespace GTAVStudio.Scripts
 {
@@ -13,6 +13,8 @@ namespace GTAVStudio.Scripts
         public static VehicleHash SpawnVehicleNextFrame;
         public static bool RepairVehicleNextFrame;
         public static bool VehicleInvincible;
+        public static bool SpeedMode;
+        public static bool StickySeatMode;
 
         public VehicleScript()
         {
@@ -22,6 +24,20 @@ namespace GTAVStudio.Scripts
 
         private static void OnKeyUp(object sender, KeyEventArgs e)
         {
+            var speedModeShortcut = StudioSettings.GetShortcut("VehicleSpeedMode", Keys.None);
+            if (speedModeShortcut != Keys.None && e.KeyData == speedModeShortcut)
+            {
+                OverlayScript.Overlay.VehicleSpeedMode = SpeedMode = !SpeedMode;
+                return;
+            }
+
+            var stickySeatModeShortcut = StudioSettings.GetShortcut("VehicleStickySeatMode", Keys.None);
+            if (stickySeatModeShortcut != Keys.None && e.KeyData == stickySeatModeShortcut)
+            {
+                OverlayScript.Overlay.StickySeatMode = StickySeatMode = !StickySeatMode;
+                return;
+            }
+
             var repairVehicleShortcut = StudioSettings.GetShortcut("RepairVehicle", Keys.Alt | Keys.R);
             if (repairVehicleShortcut != Keys.None && e.KeyData == repairVehicleShortcut)
             {
@@ -66,20 +82,28 @@ namespace GTAVStudio.Scripts
                 RepairVehicle();
             }
 
+            Game.Player.Character.CanFlyThroughWindscreen = !StickySeatMode;
+            Game.Player.Character.CanBeDraggedOutOfVehicle = !StickySeatMode;
+            
             if (Game.Player.Character.IsSittingInVehicle())
             {
                 Game.Player.Character.CurrentVehicle.IsInvincible = VehicleInvincible;
                 if (VehicleInvincible)
                 {
-                    if (Game.Player.Character.CurrentVehicle.IsDamaged)
-                    {
-                        Game.Player.Character.CurrentVehicle.Repair();
-                    }
+                    Game.Player.Character.CurrentVehicle.Repair();
+                }
+
+                if (SpeedMode)
+                {
+                    Game.Player.Character.CurrentVehicle.ApplySpeedModeThisFrame();
                 }
             }
-            else if (Game.Player.Character.LastVehicle != null && Game.Player.Character.LastVehicle.IsInvincible)
+            else if (Game.Player.Character.LastVehicle != null)
             {
-                Game.Player.Character.LastVehicle.IsInvincible = false;
+                if (Game.Player.Character.LastVehicle.IsInvincible)
+                {
+                    Game.Player.Character.LastVehicle.IsInvincible = false;
+                }
             }
         }
 
