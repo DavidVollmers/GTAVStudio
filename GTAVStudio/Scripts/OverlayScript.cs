@@ -50,7 +50,11 @@ namespace GTAVStudio.Scripts
 
         private static void OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == StudioSettings.GetValue(Constants.Settings.Overlay, "ToggleKey", Keys.F12))
+            if (e.KeyCode == Keys.Escape && _overlayToggle)
+            {
+                ToggleOverlay();
+            }
+            else if (e.KeyCode == StudioSettings.GetValue(Constants.Settings.Overlay, "ToggleKey", Keys.F12))
             {
                 ToggleOverlay();
             }
@@ -97,6 +101,7 @@ namespace GTAVStudio.Scripts
         {
             _threadStarted = true;
             _threadStarting = false;
+            Application.EnableVisualStyles();
             Application.Run(Overlay);
             Overlay.Focus();
         }

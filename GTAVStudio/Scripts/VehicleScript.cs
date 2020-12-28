@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Windows.Forms;
 using GTA;
+using GTAVStudio.Common;
 
 namespace GTAVStudio.Scripts
 {
@@ -7,10 +10,34 @@ namespace GTAVStudio.Scripts
     public class VehicleScript : Script
     {
         public static VehicleHash SpawnVehicleNextFrame;
+        public static bool RepairVehicleNextFrame;
 
         public VehicleScript()
         {
             Tick += OnTick;
+            KeyUp += OnKeyUp;
+        }
+
+        private static void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == StudioSettings.GetShortcut("RepairVehicle", Keys.Alt | Keys.R))
+            {
+                RepairVehicle();
+            }
+            else
+            {
+                var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
+                foreach (var vehicleHash in vehicleHashes)
+                {
+                    var text = Enum.GetName(typeof(VehicleHash), vehicleHash);
+                    var shortcut = StudioSettings.GetShortcut("SpawnVehicle_" + text, Keys.None);
+                    if (shortcut == Keys.None) continue;
+                    if (e.KeyData == shortcut)
+                    {
+                        SpawnVehicle(vehicleHash);
+                    }
+                }
+            }
         }
 
         private static void OnTick(object sender, EventArgs e)
@@ -21,6 +48,21 @@ namespace GTAVStudio.Scripts
                 SpawnVehicleNextFrame = 0;
 
                 SpawnVehicle(hash);
+            }
+
+            if (RepairVehicleNextFrame)
+            {
+                RepairVehicleNextFrame = false;
+
+                RepairVehicle();
+            }
+        }
+
+        internal static void RepairVehicle()
+        {
+            if (Game.Player.Character.IsSittingInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.Repair();
             }
         }
 

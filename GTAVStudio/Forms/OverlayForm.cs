@@ -18,12 +18,28 @@ namespace GTAVStudio.Forms
         public IComponent Component { get; set; }
 
         public string DefaultTranslation { get; set; }
+
+        public string ShortcutKey { get; set; }
+
+        public string ShortcutDisplayStringDefault { get; set; }
+
+        public Keys ShortcutKeysDefault { get; set; }
     }
 
     public class OverlayForm : Form
     {
         private readonly MenuStrip _menuStrip = new MenuStrip();
         private readonly List<DynamicComponent> _dynamicComponents = new List<DynamicComponent>();
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                var cp = base.CreateParams;
+                cp.ExStyle |= 0x80;
+                return cp;
+            }
+        }
 
         public OverlayForm()
         {
@@ -48,6 +64,7 @@ namespace GTAVStudio.Forms
 
             SuspendLayout();
 
+            _menuStrip.RenderMode = ToolStripRenderMode.Professional;
             _menuStrip.Renderer = new ThemeToolStripRenderer();
             _menuStrip.Dock = DockStyle.Top;
             MainMenuStrip = _menuStrip;
@@ -63,18 +80,50 @@ namespace GTAVStudio.Forms
                 DefaultTranslation = "Vehicles"
             });
 
+            var repairVehicleMenuItem = new ToolStripMenuItem();
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = repairVehicleMenuItem,
+                TranslationKey = "VehiclesMenu_Repair",
+                DefaultTranslation = "Repair Vehicle",
+                ShortcutKey = "RepairVehicle",
+                ShortcutKeysDefault = Keys.Alt | Keys.R,
+                ShortcutDisplayStringDefault = "Alt+R"
+            });
+            repairVehicleMenuItem.Click += (sender, args) => { VehicleScript.RepairVehicleNextFrame = true; };
+            vehicleMenuItem.DropDownItems.Add(repairVehicleMenuItem);
+
+            var spawnVehicleMenuItem = new ToolStripMenuItem();
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = spawnVehicleMenuItem,
+                TranslationKey = "VehiclesMenu_Spawn",
+                DefaultTranslation = "Spawn Vehicle"
+            });
+
             var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
             foreach (var vehicleHash in vehicleHashes.OrderBy(v => Enum.GetName(typeof(VehicleHash), v)))
             {
                 var menuItem = new ToolStripMenuItem();
-                menuItem.Text = Enum.GetName(typeof(VehicleHash), vehicleHash);
+                var text = Enum.GetName(typeof(VehicleHash), vehicleHash);
+                _dynamicComponents.Add(new DynamicComponent
+                {
+                    TranslationKey = "VehiclesMenu_Spawn_" + text,
+                    Component = menuItem,
+                    DefaultTranslation = text,
+                    ShortcutKey = "SpawnVehicle_" + text,
+                    ShortcutKeysDefault = Keys.None,
+                    ShortcutDisplayStringDefault = "None"
+                });
                 menuItem.Click += (sender, args) =>
                 {
                     VehicleScript.SpawnVehicleNextFrame = vehicleHash;
                     OverlayScript.ToggleOverlayNextFrame = true;
                 };
-                vehicleMenuItem.DropDownItems.Add(menuItem);
+                spawnVehicleMenuItem.DropDownItems.Add(menuItem);
             }
+
+            vehicleMenuItem.DropDownItems.Add(spawnVehicleMenuItem);
 
             _menuStrip.Items.Add(vehicleMenuItem);
 
@@ -117,6 +166,7 @@ namespace GTAVStudio.Forms
         public void Reload()
         {
             SetDynamicComponentValues();
+            ThemeColorTable.Reload();
             Refresh();
         }
 
@@ -126,14 +176,32 @@ namespace GTAVStudio.Forms
                 StudioSettings.GetValue(Constants.Settings.Theme, "TransparencyKey", Color.Red);
 
             _menuStrip.BackColor = StudioSettings.GetValue(Constants.Settings.Theme, "Menu_BackColor", Color.DimGray);
+            _menuStrip.ForeColor = StudioSettings.GetValue(Constants.Settings.Theme, "Menu_ForeColor", Color.Black);
 
             foreach (var dynamicComponent in _dynamicComponents)
             {
                 if (dynamicComponent.Component is ToolStripMenuItem menuItem)
                 {
+                    menuItem.BackColor =
+                        StudioSettings.GetValue(Constants.Settings.Theme, "Menu_Item_BackColor", Color.DimGray);
+                    menuItem.ForeColor =
+                        StudioSettings.GetValue(Constants.Settings.Theme, "Menu_Item_ForeColor", Color.Black);
+
                     menuItem.Text =
                         StudioTranslations.GetValue(Constants.Translations.Overlay, dynamicComponent.TranslationKey,
                             dynamicComponent.DefaultTranslation);
+
+                    if (dynamicComponent.ShortcutKey != null)
+                    {
+                        var shortcutKeys = StudioSettings.GetShortcut(dynamicComponent.ShortcutKey,
+                            dynamicComponent.ShortcutKeysDefault);
+                        menuItem.ShortcutKeys = shortcutKeys;
+                        menuItem.ShowShortcutKeys = shortcutKeys != Keys.None;
+                        menuItem.ShortcutKeyDisplayString =
+                            string.Join(" + ",
+                                StudioSettings.GetValue(Constants.Settings.Shortcuts, dynamicComponent.ShortcutKey,
+                                    dynamicComponent.ShortcutDisplayStringDefault).Split('+'));
+                    }
                 }
             }
         }

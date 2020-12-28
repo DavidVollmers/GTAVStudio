@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Windows.Forms;
 using GTA;
 
 namespace GTAVStudio.Common
@@ -8,6 +9,27 @@ namespace GTAVStudio.Common
     {
         private const string SettingsPath = "scripts//GTAVStudio.ini";
         private static ScriptSettings _scriptSettings = ScriptSettings.Load(SettingsPath);
+
+        public static Keys GetShortcut(string name, Keys defaultvalue)
+        {
+            var result = _scriptSettings.GetValue<string>(Constants.Settings.Shortcuts, name, null);
+            if (result == null) return defaultvalue;
+            var keys = result.Split('+');
+            var shortcut = Keys.None;
+            foreach (var key in keys)
+            {
+                if (Enum.TryParse<Keys>(key, out var shortcutKey))
+                {
+                    shortcut |= shortcutKey;
+                }
+                else
+                {
+                    return defaultvalue;
+                }
+            }
+
+            return shortcut == Keys.None ? defaultvalue : shortcut;
+        }
 
         public static T GetValue<T>(string section, string name, T defaultvalue)
         {

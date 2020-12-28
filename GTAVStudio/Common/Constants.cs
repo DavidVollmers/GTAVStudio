@@ -7,6 +7,8 @@
             public const string Overlay = nameof(Overlay);
 
             public const string Theme = nameof(Theme);
+
+            public const string Shortcuts = nameof(Shortcuts);
         }
 
         public static class Translations
