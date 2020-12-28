@@ -118,7 +118,6 @@ namespace GTAVStudio.Forms
                 menuItem.Click += (sender, args) =>
                 {
                     VehicleScript.SpawnVehicleNextFrame = vehicleHash;
-                    OverlayScript.ToggleOverlayNextFrame = true;
                 };
                 spawnVehicleMenuItem.DropDownItems.Add(menuItem);
             }
@@ -127,6 +126,51 @@ namespace GTAVStudio.Forms
 
             _menuStrip.Items.Add(vehicleMenuItem);
 
+            #endregion
+            
+            #region Weapons
+            
+            var weaponsMenuItem = new ToolStripMenuItem();
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = weaponsMenuItem,
+                TranslationKey = "WeaponsMenu",
+                DefaultTranslation = "Weapons"
+            });
+            
+            var spawnWeaponMenuItem = new ToolStripMenuItem();
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = spawnWeaponMenuItem,
+                TranslationKey = "WeaponsMenu_Spawn",
+                DefaultTranslation = "Spawn Weapon"
+            });
+            
+            var weaponHashes = Enum.GetValues(typeof(WeaponHash)).OfType<WeaponHash>();
+            foreach (var weaponHash in weaponHashes.OrderBy(w => Enum.GetName(typeof(WeaponHash), w)))
+            {
+                var menuItem = new ToolStripMenuItem();
+                var text = Enum.GetName(typeof(WeaponHash), weaponHash);
+                _dynamicComponents.Add(new DynamicComponent
+                {
+                    TranslationKey = "WeaponsMenu_Spawn_" + text,
+                    Component = menuItem,
+                    DefaultTranslation = text,
+                    ShortcutKey = "SpawnWeapon_" + text,
+                    ShortcutKeysDefault = Keys.None,
+                    ShortcutDisplayStringDefault = "None"
+                });
+                menuItem.Click += (sender, args) =>
+                {
+                    WeaponScript.SpawnWeaponNextFrame = weaponHash;
+                };
+                spawnWeaponMenuItem.DropDownItems.Add(menuItem);
+            }
+            
+            weaponsMenuItem.DropDownItems.Add(spawnWeaponMenuItem);
+
+            _menuStrip.Items.Add(weaponsMenuItem);
+            
             #endregion
 
             #region GTAVStudio

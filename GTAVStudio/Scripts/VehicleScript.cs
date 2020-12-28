@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using GTA;
+using GTA.UI;
 using GTAVStudio.Common;
 
 namespace GTAVStudio.Scripts
@@ -23,19 +24,18 @@ namespace GTAVStudio.Scripts
             if (e.KeyData == StudioSettings.GetShortcut("RepairVehicle", Keys.Alt | Keys.R))
             {
                 RepairVehicle();
+                return;
             }
-            else
+
+            var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
+            foreach (var vehicleHash in vehicleHashes)
             {
-                var vehicleHashes = Enum.GetValues(typeof(VehicleHash)).OfType<VehicleHash>();
-                foreach (var vehicleHash in vehicleHashes)
+                var text = Enum.GetName(typeof(VehicleHash), vehicleHash);
+                var shortcut = StudioSettings.GetShortcut("SpawnVehicle_" + text, Keys.None);
+                if (shortcut == Keys.None) continue;
+                if (e.KeyData == shortcut)
                 {
-                    var text = Enum.GetName(typeof(VehicleHash), vehicleHash);
-                    var shortcut = StudioSettings.GetShortcut("SpawnVehicle_" + text, Keys.None);
-                    if (shortcut == Keys.None) continue;
-                    if (e.KeyData == shortcut)
-                    {
-                        SpawnVehicle(vehicleHash);
-                    }
+                    SpawnVehicle(vehicleHash);
                 }
             }
         }
@@ -77,7 +77,8 @@ namespace GTAVStudio.Scripts
 
             if (Game.Player.Character.IsSittingInVehicle())
             {
-                vehicle.ForwardSpeed = Game.Player.Character.CurrentVehicle.Speed;
+                vehicle.Velocity = Game.Player.Character.CurrentVehicle.Velocity;
+                vehicle.Speed = Game.Player.Character.CurrentVehicle.Speed;
                 Game.Player.Character.CurrentVehicle.Delete();
             }
 
