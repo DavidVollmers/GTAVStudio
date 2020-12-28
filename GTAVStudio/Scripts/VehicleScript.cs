@@ -12,6 +12,7 @@ namespace GTAVStudio.Scripts
     {
         public static VehicleHash SpawnVehicleNextFrame;
         public static bool RepairVehicleNextFrame;
+        public static bool VehicleInvincible;
 
         public VehicleScript()
         {
@@ -25,6 +26,13 @@ namespace GTAVStudio.Scripts
             if (repairVehicleShortcut != Keys.None && e.KeyData == repairVehicleShortcut)
             {
                 RepairVehicle();
+                return;
+            }
+
+            var vehicleInvincibleShortcut = StudioSettings.GetShortcut("VehicleInvincible", Keys.Alt | Keys.V);
+            if (vehicleInvincibleShortcut != Keys.None && e.KeyData == vehicleInvincibleShortcut)
+            {
+                OverlayScript.Overlay.VehicleInvincible = VehicleInvincible = !VehicleInvincible;
                 return;
             }
 
@@ -56,6 +64,22 @@ namespace GTAVStudio.Scripts
                 RepairVehicleNextFrame = false;
 
                 RepairVehicle();
+            }
+
+            if (Game.Player.Character.IsSittingInVehicle())
+            {
+                Game.Player.Character.CurrentVehicle.IsInvincible = VehicleInvincible;
+                if (VehicleInvincible)
+                {
+                    if (Game.Player.Character.CurrentVehicle.IsDamaged)
+                    {
+                        Game.Player.Character.CurrentVehicle.Repair();
+                    }
+                }
+            }
+            else if (Game.Player.Character.LastVehicle != null && Game.Player.Character.LastVehicle.IsInvincible)
+            {
+                Game.Player.Character.LastVehicle.IsInvincible = false;
             }
         }
 

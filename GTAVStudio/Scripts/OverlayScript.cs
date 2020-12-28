@@ -13,12 +13,15 @@ namespace GTAVStudio.Scripts
     public class OverlayScript : Script
     {
         public static readonly OverlayForm Overlay = new OverlayForm();
+        private static readonly IntPtr MainWindowHandle = Process.GetCurrentProcess().MainWindowHandle;
         private static bool _threadStarted;
         private static bool _threadStarting;
         private static bool _overlayToggle;
         private static Thread _thread;
         public static bool ToggleOverlayNextFrame;
         public static bool ReloadSettingsNextFrame;
+
+        public static bool IsGameActive => User32.GetForegroundWindow() == MainWindowHandle && !Game.IsPaused;
 
         public OverlayScript()
         {
@@ -90,7 +93,7 @@ namespace GTAVStudio.Scripts
                 }
                 else
                 {
-                    User32.SetForegroundWindow(Process.GetCurrentProcess().MainWindowHandle);
+                    User32.SetForegroundWindow(MainWindowHandle);
                 }
             }
 

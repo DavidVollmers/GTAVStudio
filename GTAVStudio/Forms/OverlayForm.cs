@@ -33,6 +33,9 @@ namespace GTAVStudio.Forms
         private readonly ToolStripMenuItem _infiniteAmmoMenuItem = new ToolStripMenuItem();
         private readonly ToolStripMenuItem _explosiveAmmoMenuItem = new ToolStripMenuItem();
         private readonly ToolStripMenuItem _playerInvincibleMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _disableWantedLevelMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _vehicleInvincibleMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _playerFlyModeMenuItem = new ToolStripMenuItem();
 
         public bool InfiniteAmmo
         {
@@ -47,6 +50,21 @@ namespace GTAVStudio.Forms
         public bool PlayerInvincible
         {
             set => _playerInvincibleMenuItem.Checked = value;
+        }
+
+        public bool PlayerFlyMode
+        {
+            set => _playerFlyModeMenuItem.Checked = value;
+        }
+
+        public bool DisableWantedLevel
+        {
+            set => _disableWantedLevelMenuItem.Checked = value;
+        }
+
+        public bool VehicleInvincible
+        {
+            set => _vehicleInvincibleMenuItem.Checked = value;
         }
 
         protected override CreateParams CreateParams
@@ -114,6 +132,38 @@ namespace GTAVStudio.Forms
             };
             playerMenuItem.DropDownItems.Add(_playerInvincibleMenuItem);
             
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _disableWantedLevelMenuItem,
+                TranslationKey = "PlayerMenu_DisableWantedLevel",
+                DefaultTranslation = "Disable Wanted Level",
+                ShortcutKey = "DisableWantedLevel",
+                ShortcutKeysDefault = Keys.Alt | Keys.W,
+                ShortcutDisplayStringDefault = "Alt+W"
+            });
+            _disableWantedLevelMenuItem.CheckOnClick = true;
+            _disableWantedLevelMenuItem.CheckedChanged += (sender, args) =>
+            {
+                PlayerScript.DisableWantedLevel = _disableWantedLevelMenuItem.Checked;
+            };
+            playerMenuItem.DropDownItems.Add(_disableWantedLevelMenuItem);
+            
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _playerFlyModeMenuItem,
+                TranslationKey = "PlayerMenu_FlyMode",
+                DefaultTranslation = "Enable Flying",
+                ShortcutKey = "PlayerFlyMode",
+                ShortcutKeysDefault = Keys.Alt | Keys.F,
+                ShortcutDisplayStringDefault = "Alt+F"
+            });
+            _playerFlyModeMenuItem.CheckOnClick = true;
+            _playerFlyModeMenuItem.CheckedChanged += (sender, args) =>
+            {
+                PlayerScript.FlyMode = _playerFlyModeMenuItem.Checked;
+            };
+            playerMenuItem.DropDownItems.Add(_playerFlyModeMenuItem);
+            
             _menuStrip.Items.Add(playerMenuItem);
 
             #endregion
@@ -127,6 +177,22 @@ namespace GTAVStudio.Forms
                 TranslationKey = "VehiclesMenu",
                 DefaultTranslation = "Vehicles"
             });
+            
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _vehicleInvincibleMenuItem,
+                TranslationKey = "VehiclesMenu_Invincible",
+                DefaultTranslation = "Invincible",
+                ShortcutKey = "VehicleInvincible",
+                ShortcutKeysDefault = Keys.Alt | Keys.V,
+                ShortcutDisplayStringDefault = "Alt+V"
+            });
+            _vehicleInvincibleMenuItem.CheckOnClick = true;
+            _vehicleInvincibleMenuItem.CheckedChanged += (sender, args) =>
+            {
+                VehicleScript.VehicleInvincible = _vehicleInvincibleMenuItem.Checked;
+            };
+            vehicleMenuItem.DropDownItems.Add(_vehicleInvincibleMenuItem);
 
             var repairVehicleMenuItem = new ToolStripMenuItem();
             _dynamicComponents.Add(new DynamicComponent

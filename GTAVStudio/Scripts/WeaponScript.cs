@@ -63,7 +63,7 @@ namespace GTAVStudio.Scripts
 
             if (ExplosiveAmmo && Game.Player.Character.IsShooting)
             {
-                World.AddExplosion(Game.Player.Character.LastWeaponImpactPosition, ExplosionType.Grenade, 100, .25f, Game.Player.Character);
+                World.AddExplosion(Game.Player.Character.LastWeaponImpactPosition, ExplosionType.Grenade, 2, .25f, Game.Player.Character);
             }
         }
 
