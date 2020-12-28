@@ -30,6 +30,24 @@ namespace GTAVStudio.Forms
     {
         private readonly MenuStrip _menuStrip = new MenuStrip();
         private readonly List<DynamicComponent> _dynamicComponents = new List<DynamicComponent>();
+        private readonly ToolStripMenuItem _infiniteAmmoMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _explosiveAmmoMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _playerInvincibleMenuItem = new ToolStripMenuItem();
+
+        public bool InfiniteAmmo
+        {
+            set => _infiniteAmmoMenuItem.Checked = value;
+        }
+
+        public bool ExplosiveAmmo
+        {
+            set => _explosiveAmmoMenuItem.Checked = value;
+        }
+
+        public bool PlayerInvincible
+        {
+            set => _playerInvincibleMenuItem.Checked = value;
+        }
 
         protected override CreateParams CreateParams
         {
@@ -70,6 +88,36 @@ namespace GTAVStudio.Forms
             MainMenuStrip = _menuStrip;
             Height = _menuStrip.Height;
 
+            #region Player
+
+            var playerMenuItem = new ToolStripMenuItem();
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = playerMenuItem,
+                TranslationKey = "PlayerMenu",
+                DefaultTranslation = "Player"
+            });
+
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _playerInvincibleMenuItem,
+                TranslationKey = "PlayerMenu_Invincible",
+                DefaultTranslation = "Invincible",
+                ShortcutKey = "PlayerInvincible",
+                ShortcutKeysDefault = Keys.Alt | Keys.I,
+                ShortcutDisplayStringDefault = "Alt+I"
+            });
+            _playerInvincibleMenuItem.CheckOnClick = true;
+            _playerInvincibleMenuItem.CheckedChanged += (sender, args) =>
+            {
+                PlayerScript.Invincible = _playerInvincibleMenuItem.Checked;
+            };
+            playerMenuItem.DropDownItems.Add(_playerInvincibleMenuItem);
+            
+            _menuStrip.Items.Add(playerMenuItem);
+
+            #endregion
+            
             #region Vehicles
 
             var vehicleMenuItem = new ToolStripMenuItem();
@@ -115,10 +163,7 @@ namespace GTAVStudio.Forms
                     ShortcutKeysDefault = Keys.None,
                     ShortcutDisplayStringDefault = "None"
                 });
-                menuItem.Click += (sender, args) =>
-                {
-                    VehicleScript.SpawnVehicleNextFrame = vehicleHash;
-                };
+                menuItem.Click += (sender, args) => { VehicleScript.SpawnVehicleNextFrame = vehicleHash; };
                 spawnVehicleMenuItem.DropDownItems.Add(menuItem);
             }
 
@@ -127,9 +172,9 @@ namespace GTAVStudio.Forms
             _menuStrip.Items.Add(vehicleMenuItem);
 
             #endregion
-            
+
             #region Weapons
-            
+
             var weaponsMenuItem = new ToolStripMenuItem();
             _dynamicComponents.Add(new DynamicComponent
             {
@@ -137,7 +182,39 @@ namespace GTAVStudio.Forms
                 TranslationKey = "WeaponsMenu",
                 DefaultTranslation = "Weapons"
             });
+
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _explosiveAmmoMenuItem,
+                TranslationKey = "WeaponsMenu_ExplosiveAmmo",
+                DefaultTranslation = "Explosive Ammunition",
+                ShortcutKey = "ExplosiveAmmo",
+                ShortcutKeysDefault = Keys.None,
+                ShortcutDisplayStringDefault = "None"
+            });
+            _explosiveAmmoMenuItem.CheckOnClick = true;
+            _explosiveAmmoMenuItem.CheckedChanged += (sender, args) =>
+            {
+                WeaponScript.ExplosiveAmmo = _explosiveAmmoMenuItem.Checked;
+            };
+            weaponsMenuItem.DropDownItems.Add(_explosiveAmmoMenuItem);
             
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _infiniteAmmoMenuItem,
+                TranslationKey = "WeaponsMenu_InfiniteAmmo",
+                DefaultTranslation = "Infinite Ammunition",
+                ShortcutKey = "InfiniteAmmo",
+                ShortcutKeysDefault = Keys.Alt | Keys.A,
+                ShortcutDisplayStringDefault = "Alt+A"
+            });
+            _infiniteAmmoMenuItem.CheckOnClick = true;
+            _infiniteAmmoMenuItem.CheckedChanged += (sender, args) =>
+            {
+                WeaponScript.InfiniteAmmo = _infiniteAmmoMenuItem.Checked;
+            };
+            weaponsMenuItem.DropDownItems.Add(_infiniteAmmoMenuItem);
+
             var spawnWeaponMenuItem = new ToolStripMenuItem();
             _dynamicComponents.Add(new DynamicComponent
             {
@@ -145,7 +222,7 @@ namespace GTAVStudio.Forms
                 TranslationKey = "WeaponsMenu_Spawn",
                 DefaultTranslation = "Spawn Weapon"
             });
-            
+
             var weaponHashes = Enum.GetValues(typeof(WeaponHash)).OfType<WeaponHash>();
             foreach (var weaponHash in weaponHashes.OrderBy(w => Enum.GetName(typeof(WeaponHash), w)))
             {
@@ -160,17 +237,14 @@ namespace GTAVStudio.Forms
                     ShortcutKeysDefault = Keys.None,
                     ShortcutDisplayStringDefault = "None"
                 });
-                menuItem.Click += (sender, args) =>
-                {
-                    WeaponScript.SpawnWeaponNextFrame = weaponHash;
-                };
+                menuItem.Click += (sender, args) => { WeaponScript.SpawnWeaponNextFrame = weaponHash; };
                 spawnWeaponMenuItem.DropDownItems.Add(menuItem);
             }
-            
+
             weaponsMenuItem.DropDownItems.Add(spawnWeaponMenuItem);
 
             _menuStrip.Items.Add(weaponsMenuItem);
-            
+
             #endregion
 
             #region GTAVStudio

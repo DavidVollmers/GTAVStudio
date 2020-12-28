@@ -12,7 +12,7 @@ namespace GTAVStudio.Scripts
     // ReSharper disable once ClassNeverInstantiated.Global
     public class OverlayScript : Script
     {
-        private static OverlayForm Overlay = new OverlayForm();
+        public static readonly OverlayForm Overlay = new OverlayForm();
         private static bool _threadStarted;
         private static bool _threadStarting;
         private static bool _overlayToggle;

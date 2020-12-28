@@ -10,6 +10,8 @@ namespace GTAVStudio.Scripts
     public class WeaponScript : Script
     {
         public static WeaponHash SpawnWeaponNextFrame;
+        public static bool InfiniteAmmo;
+        public static bool ExplosiveAmmo;
 
         public WeaponScript()
         {
@@ -19,6 +21,20 @@ namespace GTAVStudio.Scripts
 
         private static void OnKeyUp(object sender, KeyEventArgs e)
         {
+            var infiniteAmmoShortcut = StudioSettings.GetShortcut("InfiniteAmmo", Keys.Alt | Keys.A);
+            if (infiniteAmmoShortcut != Keys.None && e.KeyData == infiniteAmmoShortcut)
+            {
+                OverlayScript.Overlay.InfiniteAmmo = InfiniteAmmo = !InfiniteAmmo;
+                return;
+            }
+
+            var explosiveAmmoShortcut = StudioSettings.GetShortcut("ExplosiveAmmo", Keys.None);
+            if (explosiveAmmoShortcut != Keys.None && e.KeyData == explosiveAmmoShortcut)
+            {
+                OverlayScript.Overlay.ExplosiveAmmo = ExplosiveAmmo = !ExplosiveAmmo;
+                return;
+            }
+
             var weaponHashes = Enum.GetValues(typeof(WeaponHash)).OfType<WeaponHash>();
             foreach (var weaponHash in weaponHashes)
             {
@@ -40,6 +56,14 @@ namespace GTAVStudio.Scripts
                 SpawnWeaponNextFrame = 0;
 
                 SpawnWeapon(hash);
+            }
+
+            Game.Player.Character.Weapons.Current.InfiniteAmmo = InfiniteAmmo;
+            Game.Player.Character.Weapons.Current.InfiniteAmmoClip = InfiniteAmmo;
+
+            if (ExplosiveAmmo && Game.Player.Character.IsShooting)
+            {
+                World.AddExplosion(Game.Player.Character.LastWeaponImpactPosition, ExplosionType.Grenade, 100, .25f, Game.Player.Character);
             }
         }
 

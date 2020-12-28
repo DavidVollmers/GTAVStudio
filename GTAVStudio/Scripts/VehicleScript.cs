@@ -21,7 +21,8 @@ namespace GTAVStudio.Scripts
 
         private static void OnKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyData == StudioSettings.GetShortcut("RepairVehicle", Keys.Alt | Keys.R))
+            var repairVehicleShortcut = StudioSettings.GetShortcut("RepairVehicle", Keys.Alt | Keys.R);
+            if (repairVehicleShortcut != Keys.None && e.KeyData == repairVehicleShortcut)
             {
                 RepairVehicle();
                 return;
