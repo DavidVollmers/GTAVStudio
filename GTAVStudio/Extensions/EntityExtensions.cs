@@ -30,14 +30,14 @@ namespace GTAVStudio.Extensions
 
                 if (User32.GetKeyState(Keys.W).HasFlag(User32.KeyStates.Down))
                 {
-                    velocity.X += targetDirection.X * 80;
-                    velocity.Y += targetDirection.Y * 80;
+                    velocity.X += targetDirection.X * 40;
+                    velocity.Y += targetDirection.Y * 40;
                 }
 
                 if (User32.GetKeyState(Keys.S).HasFlag(User32.KeyStates.Down))
                 {
-                    velocity.X -= targetDirection.X * 80;
-                    velocity.Y -= targetDirection.Y * 80;
+                    velocity.X -= targetDirection.X * 40;
+                    velocity.Y -= targetDirection.Y * 40;
                 }
             }
 
@@ -68,13 +68,17 @@ namespace GTAVStudio.Extensions
                 var forwardBackVelocity = 20;
                 var reverseBackwardVelocity = isFollowedByCamera;
                 
-                if (target is Ped ped && (ped.IsInParachuteFreeFall || ped.IsRagdoll))
+                if (target is Ped ped && (ped.IsInParachuteFreeFall || ped.IsRagdoll || ped.IsAiming))
                 {
-                    upDownVelocity = 20;
-                    forwardBackVelocity = 80;
+                    if (!ped.IsAiming)
+                    {
+                        upDownVelocity = 20;
+                        forwardBackVelocity = 80;
+                    }
+                    
                     reverseBackwardVelocity = false;
                 }
-                
+
                 if (User32.GetKeyState(Keys.W).HasFlag(User32.KeyStates.Down)
                     || User32.GetKeyState(Keys.S).HasFlag(User32.KeyStates.Down) && reverseBackwardVelocity)
                 {
