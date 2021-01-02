@@ -5,6 +5,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{FF495A12-2330-4095-BABE-A1D8FBBFEF15}"
 ProjectSection(SolutionItems) = preProject
 	.gitignore = .gitignore
+	README.md = README.md
 EndProjectSection
 EndProject
 Global

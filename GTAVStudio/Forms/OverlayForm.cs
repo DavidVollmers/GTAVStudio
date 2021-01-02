@@ -38,7 +38,13 @@ namespace GTAVStudio.Forms
         private readonly ToolStripMenuItem _playerFlyModeMenuItem = new ToolStripMenuItem();
         private readonly ToolStripMenuItem _vehicleSpeedModeMenuItem = new ToolStripMenuItem();
         private readonly ToolStripMenuItem _stickySeatModeMenuItem = new ToolStripMenuItem();
+        private readonly ToolStripMenuItem _playerSkillDeadEye = new ToolStripMenuItem();
 
+        public bool PlayerSkillDeadEye
+        {
+            set => _playerSkillDeadEye.Checked = value;
+        }
+        
         public bool InfiniteAmmo
         {
             set => _infiniteAmmoMenuItem.Checked = value;
@@ -175,6 +181,32 @@ namespace GTAVStudio.Forms
                 PlayerScript.FlyMode = _playerFlyModeMenuItem.Checked;
             };
             playerMenuItem.DropDownItems.Add(_playerFlyModeMenuItem);
+
+            var playerSkillsMenuItem = new ToolStripMenuItem();
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = playerSkillsMenuItem,
+                TranslationKey = "PlayerMenu_SkillMenu",
+                DefaultTranslation = "Skills"
+            });
+            
+            _dynamicComponents.Add(new DynamicComponent
+            {
+                Component = _playerSkillDeadEye,
+                TranslationKey = "PlayerMenu_SkillMenu_DeadEye",
+                DefaultTranslation = "DeadEye",
+                ShortcutKey = "PlayerSkill_DeadEye",
+                ShortcutKeysDefault = Keys.None,
+                ShortcutDisplayStringDefault = "None"
+            });
+            _playerSkillDeadEye.CheckOnClick = true;
+            _playerSkillDeadEye.CheckedChanged += (sender, args) =>
+            {
+                PlayerSkillsScript.DeadEye = _playerSkillDeadEye.Checked;
+            };
+            playerSkillsMenuItem.DropDownItems.Add(_playerSkillDeadEye);
+            
+            playerMenuItem.DropDownItems.Add(playerSkillsMenuItem);
             
             _menuStrip.Items.Add(playerMenuItem);
 
