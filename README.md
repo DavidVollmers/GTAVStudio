@@ -43,13 +43,15 @@ ReloadKey = Insert
 
 ### Troubleshooting
 
-- Depending on the system your IDE and the Game itself will require administrative permissions on the GTA V folder.
+- Depending on the system your IDE and the Game itself (including the launcher and every wrapper, e.g. Steam/Epic Games...) will require administrative permissions on the GTA V folder.
 
 - There are a couple of log files in your GTA V folder which can be helpful:
 
     - `ScriptHookVDotNet.log` (Logs from the .NET script hook)
     - `ScriptHookV.log` (Logs from the general script hook written in C++)
     - `asiloader.log` (Logs from the ASI loader which loads the script hooks)
+    
+- There are also logs for your Rockstar Games launcher in your `%userprofile%\Documents\Rockstar Games\Launcher` folder. 
 
 ### Coding Conventions
 
